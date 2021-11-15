@@ -43,9 +43,21 @@
                                 <rect key="frame" x="0.0" y="59.5" width="414" height="717"/>
                                 <color key="backgroundColor" white="0.0" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                             </view>
-                            <imageView hidden="YES" clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="C64-0b-TF7">
+                            <view hidden="YES" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="znq-uY-C2q">
                                 <rect key="frame" x="0.0" y="59.5" width="414" height="717"/>
-                            </imageView>
+                                <subviews>
+                                    <imageView hidden="YES" clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="C64-0b-TF7">
+                                        <rect key="frame" x="0.0" y="0.0" width="414" height="717"/>
+                                    </imageView>
+                                </subviews>
+                                <color key="backgroundColor" systemColor="systemBackgroundColor"/>
+                                <constraints>
+                                    <constraint firstItem="C64-0b-TF7" firstAttribute="top" secondItem="znq-uY-C2q" secondAttribute="top" id="D3J-Iw-0j2"/>
+                                    <constraint firstItem="C64-0b-TF7" firstAttribute="height" secondItem="znq-uY-C2q" secondAttribute="height" id="N6j-0H-R5M"/>
+                                    <constraint firstItem="C64-0b-TF7" firstAttribute="leading" secondItem="znq-uY-C2q" secondAttribute="leading" id="OKH-G5-0Kh"/>
+                                    <constraint firstItem="C64-0b-TF7" firstAttribute="width" secondItem="znq-uY-C2q" secondAttribute="width" id="fJf-II-BcN"/>
+                                </constraints>
+                            </view>
                             <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="3OC-XM-BRk">
                                 <rect key="frame" x="0.0" y="776.5" width="414" height="119.5"/>
                                 <subviews>
@@ -143,19 +155,19 @@
                         <constraints>
                             <constraint firstItem="E54-Pf-tjq" firstAttribute="height" secondItem="3OC-XM-BRk" secondAttribute="height" multiplier="1:2" id="Dvz-Qz-aqi"/>
                             <constraint firstItem="3OC-XM-BRk" firstAttribute="top" secondItem="5DB-df-L8e" secondAttribute="bottom" id="Hcs-gq-UkN"/>
+                            <constraint firstItem="znq-uY-C2q" firstAttribute="leading" secondItem="5DB-df-L8e" secondAttribute="leading" id="Hht-XE-Gts"/>
                             <constraint firstItem="6Tk-OE-BBY" firstAttribute="trailing" secondItem="5DB-df-L8e" secondAttribute="trailing" id="IuJ-gL-b4z"/>
-                            <constraint firstItem="6Tk-OE-BBY" firstAttribute="trailing" secondItem="C64-0b-TF7" secondAttribute="trailing" id="O0E-PY-6OI"/>
+                            <constraint firstItem="znq-uY-C2q" firstAttribute="height" secondItem="5DB-df-L8e" secondAttribute="height" id="MyS-Bh-tOi"/>
                             <constraint firstItem="5DB-df-L8e" firstAttribute="height" secondItem="3OC-XM-BRk" secondAttribute="height" multiplier="6:1" id="ORs-63-lJn"/>
                             <constraint firstItem="6Tk-OE-BBY" firstAttribute="trailing" secondItem="E54-Pf-tjq" secondAttribute="trailing" id="Ogu-4E-l5l"/>
                             <constraint firstItem="6Tk-OE-BBY" firstAttribute="trailing" secondItem="3OC-XM-BRk" secondAttribute="trailing" id="auf-Vu-jn8"/>
-                            <constraint firstItem="C64-0b-TF7" firstAttribute="top" secondItem="E54-Pf-tjq" secondAttribute="bottom" id="dYx-2H-8yU"/>
                             <constraint firstItem="E54-Pf-tjq" firstAttribute="leading" secondItem="6Tk-OE-BBY" secondAttribute="leading" id="diH-mz-iY1"/>
                             <constraint firstAttribute="bottom" secondItem="3OC-XM-BRk" secondAttribute="bottom" id="dp6-Zt-t2E"/>
                             <constraint firstItem="5DB-df-L8e" firstAttribute="leading" secondItem="6Tk-OE-BBY" secondAttribute="leading" id="e3Q-UD-zD6"/>
-                            <constraint firstItem="C64-0b-TF7" firstAttribute="height" secondItem="5DB-df-L8e" secondAttribute="height" id="fnN-E5-AzG"/>
                             <constraint firstItem="5DB-df-L8e" firstAttribute="top" secondItem="E54-Pf-tjq" secondAttribute="bottom" id="jTs-Gb-Yai"/>
+                            <constraint firstItem="znq-uY-C2q" firstAttribute="width" secondItem="5DB-df-L8e" secondAttribute="width" id="lH5-s6-uBg"/>
+                            <constraint firstItem="znq-uY-C2q" firstAttribute="top" secondItem="5DB-df-L8e" secondAttribute="top" id="mF6-s6-Fi8"/>
                             <constraint firstItem="3OC-XM-BRk" firstAttribute="leading" secondItem="6Tk-OE-BBY" secondAttribute="leading" id="nLh-6f-shl"/>
-                            <constraint firstItem="C64-0b-TF7" firstAttribute="leading" secondItem="6Tk-OE-BBY" secondAttribute="leading" id="wzq-wv-0Bb"/>
                             <constraint firstItem="E54-Pf-tjq" firstAttribute="top" secondItem="8bC-Xf-vdC" secondAttribute="top" id="x74-ir-bao"/>
                         </constraints>
                     </view>
@@ -168,6 +180,7 @@
                         <outlet property="previewView" destination="5DB-df-L8e" id="DQ1-oA-Y7u"/>
                         <outlet property="saveButton" destination="Blb-JH-zSk" id="GI0-eb-RTx"/>
                         <outlet property="showImage" destination="C64-0b-TF7" id="EgZ-Lw-71j"/>
+                        <outlet property="showImageView" destination="znq-uY-C2q" id="V22-dc-7Vj"/>
                         <outlet property="switchButton" destination="Bt6-cp-EGn" id="2Sr-w2-QHa"/>
                     </connections>
                 </viewController>

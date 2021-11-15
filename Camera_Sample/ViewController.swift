@@ -6,7 +6,6 @@
 //
 // 참고 : AVFoundation 관련해서 공부하고 싶으면 learning avfoundation 책 으로 공부하라고하는데 영문 서적인듯... 개정 별로 안해서 오래된듯..
 //추가해야할거 단일촬영 할지 연속촬영 할지 근데 이거는 가져다 붙일때 알아서 구현해도 될듯????
-//landscape모드 도 생각해봐야함
 //가이드라인 그리는거
 
 import UIKit
@@ -27,6 +26,8 @@ class ViewController: UIViewController {
     var flash = false
     var picture = true //사진 연속으로 찍는거 방지
     var zoomScaleRange: ClosedRange<CGFloat> = 1...10
+    var videoOrientation: AVCaptureVideoOrientation = .portrait
+    let currentDevice = UIDevice.current
     var setImage = UIImage()
     let sessionQueue = DispatchQueue(label: "session Queue")
     let videoDeviceDiscoverySession = AVCaptureDevice.DiscoverySession(deviceTypes: [.builtInDualCamera, .builtInWideAngleCamera, .builtInTrueDepthCamera], mediaType: .video, position: .unspecified) // 디바이스를 찾는 객체, 첫번쩨인자값 에는 카매라뒷면 종류(아이폰 기종에따라 카메라 달린개수 그런거)에따라 가져오는게 다름 그래서 종류별로 넣어주는게 좋음 //posision에는 카메라 방향 설정임 앞,뒤,둘다사용하도록 설정할수있음
@@ -39,6 +40,7 @@ class ViewController: UIViewController {
     @IBOutlet weak var switchButton: UIButton!
     @IBOutlet weak var deleteButton: UIButton!
     @IBOutlet weak var saveButton: UIButton!
+    @IBOutlet weak var showImageView: UIView!
     @IBOutlet weak var showImage: UIImageView!
     
     
@@ -56,14 +58,25 @@ class ViewController: UIViewController {
         setupUI()
         let pinch = UIPinchGestureRecognizer(target: self, action: #selector(handlePinch(_:)))
         previewView.addGestureRecognizer(pinch)
+        
+        setVideoOrientationForDeviceOrientation(currentDevice.orientation)
+        NotificationCenter.default.addObserver(self,
+                                               selector: #selector(deviceOrientationChanged(_:)),
+                                               name: UIDevice.orientationDidChangeNotification,
+                                               object: nil)
     }
-    
+    //TODO: 그냥 UI설정임..
     func setupUI(){
         
         photoLibraryButton.layer.cornerRadius = 10
         photoLibraryButton.layer.masksToBounds = true
         photoLibraryButton.layer.borderColor = UIColor.white.cgColor
         photoLibraryButton.layer.borderWidth = 1
+        
+        switchButton.layer.cornerRadius = 10
+        switchButton.layer.masksToBounds = true
+        switchButton.layer.borderColor = UIColor.white.cgColor
+        switchButton.layer.borderWidth = 1
         
         captureButton.layer.cornerRadius = captureButton.bounds.height/2
         captureButton.layer.masksToBounds = true
@@ -162,10 +175,11 @@ class ViewController: UIViewController {
         //photoOutput
         if picture {
             picture = false
-            let videoPreviewLayerOrientation = self.previewView.videoPreviewLayer.connection?.videoOrientation
+//            let videoPreviewLayerOrientation = self.previewView.videoPreviewLayer.connection?.videoOrientation
+            let videoPreviewLayerOrientation = videoOrientation //현재 화면방향
             sessionQueue.async {
                 let connection = self.photoOutput.connection(with: .video)
-                connection?.videoOrientation = videoPreviewLayerOrientation!
+                connection?.videoOrientation = videoPreviewLayerOrientation
                 
                 //사진찍는거 요청
                 let setting = AVCapturePhotoSettings()
@@ -228,6 +242,40 @@ class ViewController: UIViewController {
             }
         default:
             return
+        }
+    }
+    
+    //MARK: 화면방향에 관련
+    @objc private func deviceOrientationChanged(_ note: Notification) {
+        setVideoOrientationForDeviceOrientation(currentDevice.orientation)
+    }
+    
+    private func setVideoOrientationForDeviceOrientation(_ deviceOrientation: UIDeviceOrientation) {
+        switch deviceOrientation {
+        case .portrait:
+            videoOrientation = .portrait
+            buttonAnimated(button: photoLibraryButton, rotationAngle: CGFloat.pi*2, duration: 0.25)
+            buttonAnimated(button: switchButton, rotationAngle: CGFloat.pi*2, duration: 0.25)
+            
+        case .portraitUpsideDown:
+            videoOrientation = .portraitUpsideDown
+            buttonAnimated(button: photoLibraryButton, rotationAngle: CGFloat.pi, duration: 0.25)
+            buttonAnimated(button: switchButton, rotationAngle: CGFloat.pi, duration: 0.25)
+            
+        case .landscapeLeft:
+            videoOrientation = .landscapeRight
+            buttonAnimated(button: photoLibraryButton, rotationAngle: CGFloat.pi/2, duration: 0.25)
+            buttonAnimated(button: switchButton, rotationAngle: CGFloat.pi/2, duration: 0.25)
+            
+            
+        case .landscapeRight:
+            videoOrientation = .landscapeLeft
+            buttonAnimated(button: photoLibraryButton, rotationAngle: -CGFloat.pi/2, duration: 0.25)
+            buttonAnimated(button: switchButton, rotationAngle: -CGFloat.pi/2, duration: 0.25)
+            
+            
+        default:
+            break
         }
     }
 }
@@ -304,8 +352,14 @@ extension ViewController {
         deleteButton.isHidden = !deleteButton.isHidden
         saveButton.isHidden = !saveButton.isHidden
         showImage.isHidden = !showImage.isHidden
+        showImageView.isHidden = !showImageView.isHidden
     }
-    
+    //TODO: 버튼 animation관련 이미지나 이런거 응용할수있을듯
+    func buttonAnimated( button:UIButton, rotationAngle:CGFloat, duration:TimeInterval){
+        UIView.animate(withDuration: duration) {
+            button.transform = CGAffineTransform(rotationAngle: rotationAngle)
+        }
+    }
 
 }
 
