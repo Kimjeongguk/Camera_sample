@@ -5,12 +5,10 @@
 //  Created by jeongguk on 2021/11/12.
 //
 // 참고 : AVFoundation 관련해서 공부하고 싶으면 learning avfoundation 책 으로 공부하라고하는데 영문 서적인듯... 개정 별로 안해서 오래된듯..
-
 //추가해야할거 단일촬영 할지 연속촬영 할지 근데 이거는 가져다 붙일때 알아서 구현해도 될듯????
 //landscape모드 도 생각해봐야함
-//카메라 하단 뷰 따로만들어서 관리할수있도록 수정
 //가이드라인 그리는거
-//배율 적용도 해야함~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
 import UIKit
 import AVFoundation
 import Photos
@@ -27,6 +25,8 @@ class ViewController: UIViewController {
     var videoDeviceInput: AVCaptureDeviceInput! //전면, 후면 카메라에따라 달라질 수 있어서 var로 선언함
     let photoOutput = AVCapturePhotoOutput()
     var flash = false
+    var picture = true //사진 연속으로 찍는거 방지
+    var zoomScaleRange: ClosedRange<CGFloat> = 1...10
     var setImage = UIImage()
     let sessionQueue = DispatchQueue(label: "session Queue")
     let videoDeviceDiscoverySession = AVCaptureDevice.DiscoverySession(deviceTypes: [.builtInDualCamera, .builtInWideAngleCamera, .builtInTrueDepthCamera], mediaType: .video, position: .unspecified) // 디바이스를 찾는 객체, 첫번쩨인자값 에는 카매라뒷면 종류(아이폰 기종에따라 카메라 달린개수 그런거)에따라 가져오는게 다름 그래서 종류별로 넣어주는게 좋음 //posision에는 카메라 방향 설정임 앞,뒤,둘다사용하도록 설정할수있음
@@ -54,6 +54,8 @@ class ViewController: UIViewController {
             self.startSession()
         }
         setupUI()
+        let pinch = UIPinchGestureRecognizer(target: self, action: #selector(handlePinch(_:)))
+        previewView.addGestureRecognizer(pinch)
     }
     
     func setupUI(){
@@ -158,16 +160,18 @@ class ViewController: UIViewController {
         //TODO: photoOutput의 capturePhoto 메소드
         //orientation
         //photoOutput
-        
-        let videoPreviewLayerOrientation = self.previewView.videoPreviewLayer.connection?.videoOrientation
-        sessionQueue.async {
-            let connection = self.photoOutput.connection(with: .video)
-            connection?.videoOrientation = videoPreviewLayerOrientation!
-            
-            //사진찍는거 요청
-            let setting = AVCapturePhotoSettings()
-            setting.flashMode = self.flash ? .on : .off
-            self.photoOutput.capturePhoto(with: setting, delegate: self)
+        if picture {
+            picture = false
+            let videoPreviewLayerOrientation = self.previewView.videoPreviewLayer.connection?.videoOrientation
+            sessionQueue.async {
+                let connection = self.photoOutput.connection(with: .video)
+                connection?.videoOrientation = videoPreviewLayerOrientation!
+                
+                //사진찍는거 요청
+                let setting = AVCapturePhotoSettings()
+                setting.flashMode = self.flash ? .on : .off
+                self.photoOutput.capturePhoto(with: setting, delegate: self)
+            }
         }
         
     }
@@ -188,7 +192,44 @@ class ViewController: UIViewController {
             }
         }
     }
+    // MARK: Zoom 기능 관련
+    private func configCamera(_ camera: AVCaptureDevice?, _ config: @escaping (AVCaptureDevice) -> ()) {//zoom관련임
+            guard let device = camera else { return }
+
+            sessionQueue.async { [device] in
+                do {
+                    try device.lockForConfiguration()
+                } catch {
+                    return
+                }
+                config(device)
+                device.unlockForConfiguration()
+            }
+        }
     
+    private var initialScale: CGFloat = 0 //zoom
+    
+    @objc private func handlePinch(_ pinch: UIPinchGestureRecognizer) {
+        guard let device = videoDeviceDiscoverySession.devices.first else { return }
+
+        switch pinch.state {
+        case .began:
+            initialScale = device.videoZoomFactor
+        case .changed:
+            let minAvailableZoomScale = device.minAvailableVideoZoomFactor
+            let maxAvailableZoomScale = device.maxAvailableVideoZoomFactor
+            let availableZoomScaleRange = minAvailableZoomScale...maxAvailableZoomScale
+            let resolvedZoomScaleRange = zoomScaleRange.clamped(to: availableZoomScaleRange)
+
+            let resolvedScale = max(resolvedZoomScaleRange.lowerBound, min(pinch.scale * initialScale, resolvedZoomScaleRange.upperBound))
+
+            configCamera(device) { device in
+                device.videoZoomFactor = resolvedScale
+            }
+        default:
+            return
+        }
+    }
 }
 
 
@@ -256,6 +297,7 @@ extension ViewController {
             previewView.session?.stopRunning()
         }else {
             previewView.session?.startRunning()
+            picture = true
         }
         photoLibraryButton.isHidden = !photoLibraryButton.isHidden
         switchButton.isHidden = !switchButton.isHidden
