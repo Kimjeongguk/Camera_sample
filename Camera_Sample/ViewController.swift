@@ -4,7 +4,7 @@
 //
 //  Created by jeongguk on 2021/11/12.
 //
-// 참고 : AVFoundation 관련해서 공부하고 싶으면 learning avfoundation 책 으로 공부하라고하는데 영문 서적인듯... 개정 별로 안해서 오래된듯..
+//
 //추가해야할거 단일촬영 할지 연속촬영 할지 근데 이거는 가져다 붙일때 알아서 구현해도 될듯????
 //가이드라인 그리는거
 
@@ -366,7 +366,6 @@ extension ViewController {
 extension ViewController: AVCapturePhotoCaptureDelegate {
     func photoOutput(_ output: AVCapturePhotoOutput, didFinishProcessingPhoto photo: AVCapturePhoto, error: Error?) {
         //TODO: capturePhoto delegate method 구현
-        //여기서저장해줌
         
         guard error == nil else { return }
         guard let imageData = photo.fileDataRepresentation() else { return }
