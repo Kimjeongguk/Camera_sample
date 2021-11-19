@@ -5,9 +5,9 @@
 //  Created by jeongguk on 2021/11/12.
 //
 //
-//추가해야할거 단일촬영 할지 연속촬영 할지 근데 이거는 가져다 붙일때 알아서 구현해도 될듯????
-//가이드라인 그리는거
-
+//추가해야할거 단일촬영 할지 연속촬영 할지 근데 이거는 가져다 붙일때 구현해도 될듯????
+//가이드라인 그리는거 이것도 필요하면 할거임
+//사진첩접근은 안함 ~~~ 필요하면 할거임
 import UIKit
 import AVFoundation
 import Photos
@@ -47,16 +47,21 @@ class ViewController: UIViewController {
     override var prefersStatusBarHidden: Bool{
         return true
     }
+    override func viewDidAppear(_ animated: Bool) {
+        checkCameraPermission() //alert 띄우는거는 viewDidAppear안에서 실행해 줘야함
+    }
     override func viewDidLoad() {
         super.viewDidLoad()
         // TODO: 초기설정 2
+        
         previewView.session = captureSession //세션 연결해줌
         sessionQueue.async {
             self.setUpSession() //UI가 메모리에 올라오는 시점
             self.startSession()
         }
         setupUI()
-        let pinch = UIPinchGestureRecognizer(target: self, action: #selector(handlePinch(_:)))
+        
+        let pinch = UIPinchGestureRecognizer(target: self, action: #selector(handlePinch(_:)))//zoom관련
         previewView.addGestureRecognizer(pinch)
         
         setVideoOrientationForDeviceOrientation(currentDevice.orientation)
@@ -64,6 +69,23 @@ class ViewController: UIViewController {
                                                selector: #selector(deviceOrientationChanged(_:)),
                                                name: UIDevice.orientationDidChangeNotification,
                                                object: nil)
+    }
+    //TODO: 카메라 접근권한 확인
+    func checkCameraPermission(){
+        let status = AVCaptureDevice.authorizationStatus(for: AVMediaType.video)
+        switch status {
+        case .restricted:
+            print("액세스 불가 상태")
+        case .authorized:
+            print("권한 허용 상태")
+        case .denied:
+            let alert = UIAlertController(title: "카메라 접근권한", message: "설정->해당앱->카메라 접근권한을 설정해주세요.", preferredStyle: UIAlertController.Style.alert)
+            let okAction = UIAlertAction(title: "확인", style: .default, handler: nil)
+            alert.addAction(okAction)
+            self.present(alert, animated: true, completion: nil)
+        default:
+            break
+        }
     }
     //TODO: 그냥 UI설정임..
     func setupUI(){
