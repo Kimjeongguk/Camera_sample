@@ -11,6 +11,7 @@
 import UIKit
 import AVFoundation
 import Photos
+import BSImagePicker
 
 class ViewController: UIViewController {
     //TODO: 초기설정 1
@@ -20,6 +21,7 @@ class ViewController: UIViewController {
     //-Queue
     //-AVCaptureDevice DiscoverySession
     
+    let picker = UIImagePickerController()
     let captureSession = AVCaptureSession()
     var videoDeviceInput: AVCaptureDeviceInput! //전면, 후면 카메라에따라 달라질 수 있어서 var로 선언함
     let photoOutput = AVCapturePhotoOutput()
@@ -29,6 +31,8 @@ class ViewController: UIViewController {
     var videoOrientation: AVCaptureVideoOrientation = .portrait
     let currentDevice = UIDevice.current
     var setImage = UIImage()
+    var choosedImages = [Any]()
+    var convertImages = [UIImage]()
     let sessionQueue = DispatchQueue(label: "session Queue")
     let videoDeviceDiscoverySession = AVCaptureDevice.DiscoverySession(deviceTypes: [.builtInDualCamera, .builtInWideAngleCamera, .builtInTrueDepthCamera], mediaType: .video, position: .unspecified) // 디바이스를 찾는 객체, 첫번쩨인자값 에는 카매라뒷면 종류(아이폰 기종에따라 카메라 달린개수 그런거)에따라 가져오는게 다름 그래서 종류별로 넣어주는게 좋음 //posision에는 카메라 방향 설정임 앞,뒤,둘다사용하도록 설정할수있음
     
@@ -53,7 +57,7 @@ class ViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         // TODO: 초기설정 2
-        
+        picker.delegate = self
         previewView.session = captureSession //세션 연결해줌
         sessionQueue.async {
             self.setUpSession() //UI가 메모리에 올라오는 시점
@@ -123,6 +127,47 @@ class ViewController: UIViewController {
         }else {
             flashButton.setImage(UIImage(systemName: "bolt"), for: .normal)
             print("not flash")
+        }
+    }
+    @IBAction func photoLibrary(_ sender: Any) {
+//        picker.sourceType = .photoLibrary
+//        present(picker, animated: true, completion: nil)
+        
+        let imagePicker = ImagePickerController()
+        imagePicker.settings.selection.max = 5
+        imagePicker.settings.fetch.assets.supportedMediaTypes = [.image]
+        
+        let vc = self.view.window?.rootViewController
+
+        vc?.presentImagePicker(imagePicker, select: { asset in
+        }, deselect: { asset in
+        }, cancel: { asset in
+        }, finish: { assets in
+            for i in 0..<assets.count{
+                self.choosedImages.append(assets[i])
+            }
+            self.convertAssetToImages()
+            // 여기에 delegate를 쓰던 뭘 쓰던 해서 저장된 이미지 리스트 처리해~~convertImages에 선택한 이미지들이 들어가있음
+        })
+        
+    }
+    func convertAssetToImages() {
+        if choosedImages.count != 0 {
+            for i in 0..<choosedImages.count {
+                let imageManager = PHImageManager.default()
+                let option = PHImageRequestOptions()
+                option.isSynchronous = true
+                var thumbnail = UIImage()
+                //TODO: CGsize 가 에메하네;;; 나중에 처리할때 알아서 해
+                imageManager.requestImage(for: choosedImages[i] as! PHAsset, targetSize: CGSize(width: 200, height: 200), contentMode: .aspectFit, options: option) { result, info in
+                    thumbnail = result!
+                }
+                let data = thumbnail.jpegData(compressionQuality: 0.7)
+                let newImage = UIImage(data: data!)
+                
+                self.convertImages.append(newImage! as UIImage)
+                
+            }
         }
     }
     
@@ -400,3 +445,16 @@ extension ViewController: AVCapturePhotoCaptureDelegate {
 }
 
 
+//TODO: picker.delegate = self 사용하기위해 밑에 두개의 protocol을 넣어줘야함 참고로 imagePickerController는 이미지 한장만 가지고올수있음
+extension ViewController: UIImagePickerControllerDelegate {
+    func imagePickerController(_ picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [UIImagePickerController.InfoKey : Any]) {
+        if let image = info[.originalImage] as? UIImage {
+            print("일단 이미지 한장 가져옴^^")
+        }
+        dismiss(animated: true, completion: nil)
+    }
+}
+
+extension ViewController: UINavigationControllerDelegate {
+    
+}

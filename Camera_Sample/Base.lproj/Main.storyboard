@@ -100,7 +100,10 @@
                                             <constraint firstAttribute="width" constant="35" id="7Xd-ps-Pz2"/>
                                         </constraints>
                                         <inset key="imageEdgeInsets" minX="0.0" minY="0.0" maxX="2.2250738585072014e-308" maxY="0.0"/>
-                                        <state key="normal" title="미정"/>
+                                        <state key="normal" title="사진"/>
+                                        <connections>
+                                            <action selector="photoLibrary:" destination="BYZ-38-t0r" eventType="touchUpInside" id="g1r-T5-n1c"/>
+                                        </connections>
                                     </button>
                                     <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="Bt6-cp-EGn">
                                         <rect key="frame" x="313.5" y="42.5" width="35" height="35"/>
