@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		0E508BEC274B895700F654FF /* SelectImageViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0E508BEB274B895700F654FF /* SelectImageViewController.swift */; };
 		0EA0590B273E2DAD00A006E7 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0EA0590A273E2DAD00A006E7 /* AppDelegate.swift */; };
 		0EA0590D273E2DAD00A006E7 /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0EA0590C273E2DAD00A006E7 /* SceneDelegate.swift */; };
 		0EA0590F273E2DAD00A006E7 /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0EA0590E273E2DAD00A006E7 /* ViewController.swift */; };
@@ -18,6 +19,7 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		0E508BEB274B895700F654FF /* SelectImageViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SelectImageViewController.swift; sourceTree = "<group>"; };
 		0EA05907273E2DAD00A006E7 /* Camera_Sample.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Camera_Sample.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		0EA0590A273E2DAD00A006E7 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		0EA0590C273E2DAD00A006E7 /* SceneDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneDelegate.swift; sourceTree = "<group>"; };
@@ -69,6 +71,7 @@
 				0EA0590C273E2DAD00A006E7 /* SceneDelegate.swift */,
 				0EA0590E273E2DAD00A006E7 /* ViewController.swift */,
 				0EA0591E273E2E4400A006E7 /* PreviewView.swift */,
+				0E508BEB274B895700F654FF /* SelectImageViewController.swift */,
 				0EA05910273E2DAD00A006E7 /* Main.storyboard */,
 				0EA05913273E2DAF00A006E7 /* Assets.xcassets */,
 				0EA05915273E2DAF00A006E7 /* LaunchScreen.storyboard */,
@@ -91,7 +94,6 @@
 				5B2D5F761E8A26D310588924 /* Pods-Camera_Sample.debug.xcconfig */,
 				61C50DC3FD028E3E635F49E0 /* Pods-Camera_Sample.release.xcconfig */,
 			);
-			name = Pods;
 			path = Pods;
 			sourceTree = "<group>";
 		};
@@ -211,6 +213,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				0EA0590F273E2DAD00A006E7 /* ViewController.swift in Sources */,
+				0E508BEC274B895700F654FF /* SelectImageViewController.swift in Sources */,
 				0EA0591F273E2E4400A006E7 /* PreviewView.swift in Sources */,
 				0EA0590B273E2DAD00A006E7 /* AppDelegate.swift in Sources */,
 				0EA0590D273E2DAD00A006E7 /* SceneDelegate.swift in Sources */,
