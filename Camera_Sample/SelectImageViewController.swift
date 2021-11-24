@@ -10,12 +10,20 @@ import UIKit
 class SelectImageViewController: UIViewController {
 
     var images = [UIImage]()
+    var throwImages = [UIImage]()
     @IBOutlet weak var resultCollectionview: UICollectionView!
     @IBOutlet weak var saveButton: UIButton!
     override func viewDidLoad() {
         super.viewDidLoad()
         self.resultCollectionview.reloadData()
         
+    }
+    @IBAction func save(_ sender: Any) {
+        guard let vc = self.presentingViewController as? ViewController else {
+            return
+        }
+        vc.continuousImages = throwImages
+        self.presentingViewController?.dismiss(animated: true, completion: nil)
     }
     @IBAction func cancel(_ sender: Any) {
         dismiss(animated: true, completion: nil)
@@ -50,10 +58,12 @@ extension SelectImageViewController: UICollectionViewDelegate{
         }else {
             cell.backgroundColor = .clear
         }
-        let allCell = collectionView.visibleCells
-        let count = allCell.filter{ $0. }.count
-        print("\(count)")
-        saveButton.setTitle("(\(count))저장", for: .normal)
+        
+        guard let allCell = collectionView.visibleCells as? [ResultCell] else {
+            return
+        }
+        throwImages = allCell.filter{ $0.isSelectedImage }.map{ $0.imageView.image! }
+        saveButton.setTitle("(\(throwImages.count))저장", for: .normal)
         
     }
     

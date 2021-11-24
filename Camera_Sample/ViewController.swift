@@ -35,6 +35,7 @@ class ViewController: UIViewController {
     var convertImages = [UIImage]() //BSImagePicker
     var continuousMode = false
     var continuousImages = [UIImage]()
+    var pictureCount = 0
     
     let sessionQueue = DispatchQueue(label: "session Queue")
     let videoDeviceDiscoverySession = AVCaptureDevice.DiscoverySession(deviceTypes: [.builtInDualCamera, .builtInWideAngleCamera, .builtInTrueDepthCamera], mediaType: .video, position: .unspecified) // 디바이스를 찾는 객체, 첫번쩨인자값 에는 카매라뒷면 종류(아이폰 기종에따라 카메라 달린개수 그런거)에따라 가져오는게 다름 그래서 종류별로 넣어주는게 좋음 //posision에는 카메라 방향 설정임 앞,뒤,둘다사용하도록 설정할수있음
@@ -57,6 +58,7 @@ class ViewController: UIViewController {
     }
     override func viewDidAppear(_ animated: Bool) {
         checkCameraPermission() //alert 띄우는거는 viewDidAppear안에서 실행해 줘야함
+        continuousImagesSave()
     }
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -258,6 +260,11 @@ class ViewController: UIViewController {
         if picture {
             if !continuousMode{
                 picture = false //단일 촬영 할 때
+            }else {
+                pictureCount+=1
+                if pictureCount >= 3 {
+                    picture = false
+                }
             }
             
 //            let videoPreviewLayerOrientation = self.previewView.videoPreviewLayer.connection?.videoOrientation
@@ -274,7 +281,13 @@ class ViewController: UIViewController {
         }
         
     }
-    
+    func continuousImagesSave() { //연속 사진 저장하는거임
+        if continuousImages.count > 0{
+            for i in 0..<continuousImages.count{
+                savePhotoLibrary(image: continuousImages[i])
+            }
+        }
+    }
     func savePhotoLibrary(image: UIImage){
         // TODO: capture한 이미지 포토라이브러리에 저장
         PHPhotoLibrary.requestAuthorization { status in
@@ -352,12 +365,10 @@ class ViewController: UIViewController {
             buttonAnimated(button: photoLibraryButton, rotationAngle: CGFloat.pi/2, duration: 0.25)
             buttonAnimated(button: switchButton, rotationAngle: CGFloat.pi/2, duration: 0.25)
             
-            
         case .landscapeRight:
             videoOrientation = .landscapeLeft
             buttonAnimated(button: photoLibraryButton, rotationAngle: -CGFloat.pi/2, duration: 0.25)
             buttonAnimated(button: switchButton, rotationAngle: -CGFloat.pi/2, duration: 0.25)
-            
             
         default:
             break
@@ -465,6 +476,7 @@ extension ViewController: AVCapturePhotoCaptureDelegate {
                 guard let vc = self.storyboard?.instantiateViewController(withIdentifier: "selectImageView") as? SelectImageViewController else {
                     return
                 }
+                vc.modalPresentationStyle = .fullScreen
                 vc.images = continuousImages
                 self.present(vc, animated: true, completion: nil)
             }
