@@ -33,7 +33,6 @@ class ViewController: UIViewController {
     var setImage = UIImage()
     var choosedImages = [Any]() //BSImagePicker
     var convertImages = [UIImage]() //BSImagePicker
-    var continuousMode = false
     var continuousImages = [UIImage]()
     var pictureCount = 0
     
@@ -57,8 +56,11 @@ class ViewController: UIViewController {
         return true
     }
     override func viewDidAppear(_ animated: Bool) {
+        pictureCount = 0
         checkCameraPermission() //alert 띄우는거는 viewDidAppear안에서 실행해 줘야함
-        continuousImagesSave()
+        continuousImagesSave() //연속모드 사진저장
+        continuousImages.removeAll()
+        picture = true
     }
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -126,22 +128,14 @@ class ViewController: UIViewController {
         self.toggleButton()
     }
     @IBAction func cameraMode(_ sender: Any) {
-        continuousMode = !continuousMode
-        mode.setTitle(continuousMode ? "연속" : "단일" , for: .normal)
-//        guard let vc = self.storyboard?.instantiateViewController(withIdentifier: "selectImageView") as? SelectImageViewController else {
-//            return
-//        }
-//        
-//        self.present(vc, animated: true, completion: nil)
+        mode.setTitle(mode.titleLabel?.text == "연속" ? "단일" : "연속" , for: .normal)
     }
     @IBAction func flashMode(_ sender: Any) {
         flash = !flash
         if flash {
             flashButton.setImage(UIImage(systemName: "bolt.fill"), for: .normal)
-            print("flash")
         }else {
             flashButton.setImage(UIImage(systemName: "bolt"), for: .normal)
-            print("not flash")
         }
     }
     @IBAction func photoLibrary(_ sender: Any) {
@@ -155,7 +149,7 @@ class ViewController: UIViewController {
         imagePicker.settings.fetch.assets.supportedMediaTypes = [.image]
         
         let vc = self.view.window?.rootViewController
-
+        self.convertImages.removeAll()
         vc?.presentImagePicker(imagePicker, select: { asset in
         }, deselect: { asset in
         }, cancel: { asset in
@@ -180,9 +174,8 @@ class ViewController: UIViewController {
                     thumbnail = result!
                 }
                 let data = thumbnail.jpegData(compressionQuality: 0.7)
-                let newImage = UIImage(data: data!)
                 
-                self.convertImages.append(newImage! as UIImage)
+                self.convertImages.append(UIImage(data: data!)! as UIImage)
                 
             }
         }
@@ -258,7 +251,7 @@ class ViewController: UIViewController {
         //orientation
         //photoOutput
         if picture {
-            if !continuousMode{
+            if mode.titleLabel?.text == "단일"{
                 picture = false //단일 촬영 할 때
             }else {
                 pictureCount+=1
@@ -470,7 +463,7 @@ extension ViewController: AVCapturePhotoCaptureDelegate {
         showImage.image = image
         setImage = image
         //여기에다가 연속촬영할지 단일촬영할지 정해야람
-        if continuousMode{
+        if mode.titleLabel?.text == "연속"{
             continuousImages.append(image)
             if continuousImages.count >= 3{
                 guard let vc = self.storyboard?.instantiateViewController(withIdentifier: "selectImageView") as? SelectImageViewController else {
